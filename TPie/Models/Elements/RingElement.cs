@@ -113,8 +113,11 @@ namespace TPie.Models.Elements
                         bool drawText = jo.GetValue("DrawText") != null ? jo.Value<bool>("DrawText") : true;
                         bool drawTextOnlyWhenSelected = jo.GetValue("DrawTextOnlyWhenSelected") != null ? jo.Value<bool>("DrawTextOnlyWhenSelected") : false;
                         uint jobId = jo.Value<uint>("JobID");
-                        
-                        GearSetElement element = new GearSetElement(gearSetId, useId, name, drawText, drawTextOnlyWhenSelected, jobId);
+                        string[] addtionalCommands = [jo.Value<string>("AdditionalCommand1") ?? "",
+                            jo.Value<string>("AdditionalCommand2") ?? "",
+                            jo.Value<string>("AdditionalCommand3") ?? ""];
+
+                        GearSetElement element = new GearSetElement(gearSetId, useId, name, drawText, drawTextOnlyWhenSelected, jobId, addtionalCommands);
                         element.Border = border;
                         return element;
                     }

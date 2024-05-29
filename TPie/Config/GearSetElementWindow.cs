@@ -22,6 +22,9 @@ namespace TPie.Config
                 _gearSetElement = value;
                 _inputText = value != null ? $"{value.GearSetID}" : "";
                 _nameInputText = value?.GearSetName ?? "";
+                _addCommand1 = value?.AdditionalCommand1 ?? "";
+                _addCommand2 = value?.AdditionalCommand2 ?? "";
+                _addCommand3 = value?.AdditionalCommand3 ?? "";
 
                 if (value != null && value.JobID > 0 &&
                     JobsHelper.JobNames.TryGetValue(value.JobID, out string? jobName) && jobName != null)
@@ -50,6 +53,9 @@ namespace TPie.Config
         private List<string> _jobNames;
         private string _jobInputText = "";
         private string _nameInputText = "";
+        private string _addCommand1 = "";
+        private string _addCommand2 = "";
+        private string _addCommand3 = "";
 
         public GearSetElementWindow(string name) : base(name)
         {
@@ -115,7 +121,7 @@ namespace TPie.Config
 
             ImGui.InputText("Job ##Gear Set", ref _jobInputText, 100);
 
-            ImGui.BeginChild("##GearSets_List", new Vector2(284 * _scale, 130 * _scale), true);
+            ImGui.BeginChild("##GearSets_List", new Vector2(284 * _scale, 90 * _scale), true);
             {
                 for (int i = 0; i < _jobIds.Length; i++)
                 {
@@ -142,8 +148,19 @@ namespace TPie.Config
             }
             ImGui.EndChild();
 
-            // draw text
+            ImGui.Text("Additional Commands");
+            ImGui.SameLine();
+            ImGui.Button("?");
+            DrawHelper.SetTooltip("Additional Commands to be used after changing the job. e.g. to change a penumbra collection ");
+            ImGui.InputText("Command#1", ref _addCommand1, 100);
+            GearSetElement.AdditionalCommand1 = _addCommand1;
+            ImGui.InputText("Command#2", ref _addCommand2, 100);
+            GearSetElement.AdditionalCommand2 = _addCommand2;
+            ImGui.InputText("Command#3", ref _addCommand3, 100);
+            GearSetElement.AdditionalCommand3 = _addCommand3;
             ImGui.NewLine();
+
+            // draw text
             ImGui.Checkbox("Draw Text", ref GearSetElement.DrawText);
 
             if (GearSetElement.DrawText)

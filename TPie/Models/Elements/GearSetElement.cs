@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Newtonsoft.Json;
+using System;
 using System.Numerics;
 using TPie.Helpers;
 
@@ -12,6 +13,9 @@ namespace TPie.Models.Elements
         public string GearSetName;
         public bool DrawText;
         public bool DrawTextOnlyWhenSelected;
+        public string AdditionalCommand1;
+        public string AdditionalCommand2;
+        public string AdditionalCommand3;
 
         private uint _jobId;
 
@@ -26,38 +30,63 @@ namespace TPie.Models.Elements
             }
         }
 
-        public GearSetElement(uint gearSetId, bool useId, string? name, bool drawText, bool drawTextOnlyWhenSelected, uint jobId)
+        public GearSetElement(uint gearSetId, bool useId, string? name, bool drawText, bool drawTextOnlyWhenSelected, uint jobId, string[]? additionalCommands)
         {
-            GearSetID = gearSetId;
+            GearSetID = gearSetId; 
             UseID = useId;
             GearSetName = name ?? "";
             DrawText = drawText;
             DrawTextOnlyWhenSelected = drawTextOnlyWhenSelected;
             JobID = jobId;
+            AdditionalCommand1 = !String.IsNullOrEmpty(additionalCommands?[0]) ? additionalCommands[0] : "";
+            AdditionalCommand2 = !String.IsNullOrEmpty(additionalCommands?[1]) ? additionalCommands[1] : "";
+            AdditionalCommand3 = !String.IsNullOrEmpty(additionalCommands?[2]) ? additionalCommands[2] : "";
         }
 
-        public GearSetElement() : this(1, true, null, true, false, Plugin.ClientState.LocalPlayer?.ClassJob.Id ?? JobIDs.GLA) { }
+        public GearSetElement() : this(1, true, null, true, false, Plugin.ClientState.LocalPlayer?.ClassJob.Id ?? JobIDs.GLA, null) { }
 
         public override void ExecuteAction()
         {
+            string[] addCommands = [AdditionalCommand1, AdditionalCommand2, AdditionalCommand3];
+
             if (UseID)
             {
                 ChatHelper.SendChatMessage($"/gs change {GearSetID}");
+                
+                foreach (var command in addCommands)
+                {
+
+                    if (!String.IsNullOrEmpty(command))
+                    {
+                        ChatHelper.SendChatMessage(command);
+                    }
+                }
             }
             else
             {
                 ChatHelper.SendChatMessage($"/gs change \"{GearSetName}\"");
+                
+                foreach (var command in addCommands)
+                {
+
+                    if (!String.IsNullOrEmpty(command))
+                    {
+                        ChatHelper.SendChatMessage(command);
+                    }
+                }
             }
         }
 
         public override bool IsValid()
         {
-            return true;
+            return (string.IsNullOrEmpty(AdditionalCommand1) || AdditionalCommand1.StartsWith('/'))
+                && (string.IsNullOrEmpty(AdditionalCommand2) || AdditionalCommand2.StartsWith('/'))
+                && (string.IsNullOrEmpty(AdditionalCommand3) || AdditionalCommand3.StartsWith('/'));
         }
 
         public override string InvalidReason()
         {
-            return "";
+            return "Additional Command format is invalid";
         }
 
         public override string Description()
@@ -74,6 +103,7 @@ namespace TPie.Models.Elements
             
             return "";
         }
+
 
         public override void Draw(Vector2 position, Vector2 size, float scale, bool selected, uint color, float alpha, bool tooltip, ImDrawListPtr drawList)
         {

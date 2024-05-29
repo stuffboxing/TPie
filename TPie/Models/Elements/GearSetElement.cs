@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using System;
 using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
 using TPie.Helpers;
 
 namespace TPie.Models.Elements
@@ -32,7 +34,7 @@ namespace TPie.Models.Elements
 
         public GearSetElement(uint gearSetId, bool useId, string? name, bool drawText, bool drawTextOnlyWhenSelected, uint jobId, string[]? additionalCommands)
         {
-            GearSetID = gearSetId; 
+            GearSetID = gearSetId;
             UseID = useId;
             GearSetName = name ?? "";
             DrawText = drawText;
@@ -52,26 +54,42 @@ namespace TPie.Models.Elements
             if (UseID)
             {
                 ChatHelper.SendChatMessage($"/gs change {GearSetID}");
-                
+
                 foreach (var command in addCommands)
                 {
 
                     if (!String.IsNullOrEmpty(command))
                     {
-                        ChatHelper.SendChatMessage(command);
+                        if (command.StartsWith("/glamour"))
+                        {
+                            _ = DelayChatCommandAsync(command);
+                        }
+
+                        else
+                        {
+                            ChatHelper.SendChatMessage(command);
+                        }
                     }
                 }
             }
             else
             {
                 ChatHelper.SendChatMessage($"/gs change \"{GearSetName}\"");
-                
+
                 foreach (var command in addCommands)
                 {
 
                     if (!String.IsNullOrEmpty(command))
                     {
-                        ChatHelper.SendChatMessage(command);
+                        if (command.StartsWith("/glamour"))
+                        {
+                            _ = DelayChatCommandAsync(command);
+                        }
+
+                        else
+                        {
+                            ChatHelper.SendChatMessage(command);
+                        }                        
                     }
                 }
             }
@@ -100,7 +118,7 @@ namespace TPie.Models.Elements
 
                 return value == GearSetName ? value : $"{value} ({GearSetName})";
             }
-            
+
             return "";
         }
 
@@ -118,6 +136,29 @@ namespace TPie.Models.Elements
                 Vector2 textPos = UseID ? position + (size / 2f) - new Vector2(2 * scale) : position;
                 DrawHelper.DrawOutlinedText(text, textPos, true, scale, drawList);
             }
+        }
+
+        private void DelayChatCommand(string command, int delay = 2000)
+        {
+
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                Thread.Sleep(delay);
+                ChatHelper.SendChatMessage(command);
+                Thread.Sleep(5000);
+
+            }).Start();
+
+        }
+
+        private async Task DelayChatCommandAsync(string command, int delay = 2000)
+        {
+            // Delay before executing the command
+            await Task.Delay(delay);
+            ChatHelper.SendChatMessage(command);
+            // Ensure the method waits for an additional 5 seconds
+            //await Task.Delay(5000);
         }
     }
 }

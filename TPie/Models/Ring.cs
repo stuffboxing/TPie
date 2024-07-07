@@ -1,7 +1,5 @@
-﻿using Dalamud.Interface.Internal;
+﻿using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
-using Dalamud.Logging;
-using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -124,7 +122,7 @@ namespace TPie.Models
             KeyBind currentKeyBind = CurrentKeybind();
 
             // click to select in toggle mode
-            if (!Previewing && 
+            if (!Previewing &&
                 currentKeyBind.Toggle &&
                 ImGui.GetIO().MouseClicked[0] &&
                 ((_selectedIndex >= 0 && _selectedIndex < _validItems.Count) || _quickActionSelected))
@@ -244,7 +242,7 @@ namespace TPie.Models
             // bg
             if (Plugin.Settings.DrawRingBackground)
             {
-                IDalamudTextureWrap? bg = Plugin.RingBackground;
+                IDalamudTextureWrap? bg = Plugin.RingBackground?.GetWrapOrDefault();
                 if (bg != null)
                 {
                     Vector2 bgSize = new Vector2(Radius * 1.3f);
